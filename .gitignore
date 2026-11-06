@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+*.log
+*.cookies
+.DS_Store
+coverage/
+postgres-data/
+pgdata/
+*.dump
+*.sql.gz
