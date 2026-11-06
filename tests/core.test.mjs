@@ -1,0 +1,14 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {seedTickets,metrics,slaState,slaDetails,filterTickets,sortTickets,createTicket,changeStatus,toCSV,escapeHtml,isTicketList} from '../core.mjs';
+const now=Date.parse('2026-11-06T12:00:00Z');
+test('seed generates a valid fictional ticket set',()=>{const data=seedTickets(now);assert.equal(data.length,12);assert.ok(isTicketList(data))});
+test('metrics add up and track breached tickets',()=>{const m=metrics(seedTickets(now),now);assert.equal(m.total,12);assert.equal(m.active+m.resolved,m.total);assert.ok(m.breached>=1)});
+test('closed tickets do not breach SLA',()=>{assert.equal(slaState({status:'Resolved',priority:'Critical',createdAt:new Date(now-2*60*60000).toISOString()},now),'resolved')});
+test('SLA details expose time remaining or overdue',()=>{const details=slaDetails({status:'Open',priority:'High',createdAt:new Date(now-200*60000).toISOString()},now);assert.equal(details.state,'breached');assert.equal(details.remaining,-20)});
+test('filters include free text and status',()=>{assert.equal(filterTickets(seedTickets(now),{q:'refund',status:'Open'}).length,1);assert.equal(filterTickets(seedTickets(now),{priority:'Critical'}).length,2)});
+test('queue sorting supports SLA, priority, newest and status',()=>{const data=seedTickets(now);assert.equal(sortTickets(data,'sla',now)[0].id,'T-1042');assert.equal(sortTickets(data,'priority',now)[0].priority,'Critical');assert.equal(sortTickets(data,'newest',now)[0].id,'T-1035');assert.equal(sortTickets(data,'status',now)[0].status,'Open')});
+test('ticket creation validates subject and priority',()=>{assert.throws(()=>createTicket({subject:'X',priority:'High'}));assert.throws(()=>createTicket({subject:'Valid',priority:'Invalid'}));const data=seedTickets(now);const item=createTicket({subject:'New request',priority:'High',channel:'Chat'},data,now);assert.equal(item.id,'T-1043')});
+test('status progresses in order and completed work stays closed',()=>{const original=seedTickets(now);const id='T-1042';const a=changeStatus(original,id);assert.equal(a.find(t=>t.id===id).status,'In progress');const b=changeStatus(a,id);assert.equal(b.find(t=>t.id===id).status,'Resolved');const c=changeStatus(b,id);assert.equal(c.find(t=>t.id===id).status,'Resolved')});
+test('csv quotes embedded quote safely',()=>{const csv=toCSV([{id:'T-1',subject:'a "quote", field',category:'Billing',priority:'High',status:'Open',channel:'Chat',createdAt:new Date(now).toISOString()}]);assert.ok(csv.includes('"a ""quote"", field"'))});
+test('csv neutralizes spreadsheet formulas',()=>{const csv=toCSV([{id:'T-1',subject:'=HYPERLINK("https://example.com")',category:'Billing',priority:'High',status:'Open',channel:'Chat',createdAt:new Date(now).toISOString()}]);assert.ok(csv.includes('"\'=HYPERLINK'))});
+test('html special characters are escaped',()=>{assert.equal(escapeHtml('<script>'), '&lt;script&gt;')});
