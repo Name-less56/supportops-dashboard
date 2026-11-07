@@ -1,13 +1,13 @@
-:root{--nav-rail:88px;--nav-open:272px;--nav-speed:.32s;--ease-premium:cubic-bezier(.2,.8,.2,1);--ease-spring:cubic-bezier(.34,1.2,.64,1)}
+:root{--nav-rail:88px;--nav-open:252px;--nav-speed:.26s;--ease-premium:cubic-bezier(.2,.8,.2,1);--ease-spring:cubic-bezier(.34,1.2,.64,1)}
 [hidden]{display:none!important}
 html,body{max-width:100%;overflow-x:clip}
 @view-transition{navigation:auto}
-::view-transition-old(root){animation:page-out .24s ease both}
-::view-transition-new(root){animation:page-arrive .55s var(--ease-premium) both}
-@keyframes page-out{to{opacity:0;transform:scale(.992);filter:blur(2px)}}
-@keyframes page-arrive{from{opacity:0;transform:translateY(10px) scale(.995);filter:blur(5px)}}
+::view-transition-old(root){animation:page-out .16s ease both}
+::view-transition-new(root){animation:page-arrive .28s var(--ease-premium) both}
+@keyframes page-out{to{opacity:0}}
+@keyframes page-arrive{from{opacity:0;transform:translateY(6px)}}
 body::before{content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(circle at 78% 4%,rgba(83,139,229,.09),transparent 31%),radial-gradient(circle at 15% 92%,rgba(79,175,160,.055),transparent 28%)}
-.sidebar nav a{position:relative;overflow:hidden;will-change:transform,box-shadow;background-color:transparent}
+.sidebar nav a{position:relative;overflow:hidden;background-color:transparent}
 .sidebar nav a::after{content:"";position:absolute;left:4px;top:50%;width:3px;height:0;border-radius:6px;background:linear-gradient(180deg,#79a9f5,#3974d8);transform:translateY(-50%);opacity:0;box-shadow:0 0 10px rgba(57,116,216,.38);transition:height .42s var(--ease-premium),opacity .24s ease}
 .sidebar nav a.selected{transform:translateY(1px) scale(.985);box-shadow:inset 4px 4px 9px #cbd4e1,inset -4px -4px 9px #fff}
 .sidebar nav a.selected::after{height:25px;opacity:1}
@@ -18,16 +18,15 @@ body::before{content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;ba
 #overview,#analytics,#tickets{scroll-margin-top:28px}
 .login-developer{position:relative!important;left:auto!important;bottom:auto!important;display:inline-flex;align-items:center;gap:5px;width:max-content;margin-top:16px;padding:8px 11px;border:1px solid rgba(255,255,255,.68);border-radius:10px;background:rgba(233,239,248,.78);box-shadow:3px 3px 8px rgba(196,206,220,.65),-3px -3px 8px rgba(255,255,255,.78);backdrop-filter:blur(10px);color:#718097;font-size:8px}
 .login-developer::before{content:"";width:6px;height:6px;border-radius:50%;background:#3974d8;box-shadow:0 0 0 3px rgba(57,116,216,.12)}
-.button,.reset,.metric,.panel,.analytics-filters,.admin-form,.admin-table-wrap{transform:translateZ(0)}
 .button{position:relative;isolation:isolate;overflow:hidden;transition:transform .38s var(--ease-premium),box-shadow .38s var(--ease-premium),background .3s ease}
 .button::after{content:"";position:absolute;z-index:-1;inset:-2px;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.36) 46%,transparent 72%);transform:translateX(-130%);transition:transform .7s var(--ease-premium)}
 .button:hover::after{transform:translateX(130%)}
 .metric,.panel,.analytics-filters{position:relative;transition:transform .48s var(--ease-premium),box-shadow .48s var(--ease-premium),border-color .35s ease}
 .metric::before,.panel::before,.analytics-filters::before{content:"";position:absolute;pointer-events:none;inset:0;border-radius:inherit;border:1px solid rgba(255,255,255,.42);mask:linear-gradient(#000,transparent 68%)}
 .metric:hover,.panel:hover{transform:translateY(-3px);box-shadow:13px 15px 30px rgba(159,172,191,.46),-9px -9px 22px rgba(255,255,255,.92)}
-.main>header,.main>.analytics-filters,.main>.metrics,.main>.analytics-grid,.main>.tickets,.main>footer{opacity:0;animation:content-rise .72s var(--ease-premium) forwards}
+.main>header,.main>.analytics-filters,.main>.metrics,.main>.analytics-grid,.main>.tickets,.main>footer{opacity:0;animation:content-rise .42s var(--ease-premium) forwards}
 .main>.analytics-filters{animation-delay:.07s}.main>.metrics{animation-delay:.12s}.main>.analytics-grid{animation-delay:.18s}.main>.tickets{animation-delay:.24s}.main>footer{animation-delay:.3s}
-@keyframes content-rise{from{opacity:0;transform:translateY(15px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+@keyframes content-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media(min-width:1051px){
   .shell{grid-template-columns:var(--nav-rail) minmax(0,1fr);transition:grid-template-columns var(--nav-speed) var(--ease-premium)}
   .shell.sidebar-expanded{grid-template-columns:var(--nav-open) minmax(0,1fr)}
@@ -64,7 +63,7 @@ body::before{content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;ba
 .admin-infrastructure #admin-sync.is-syncing span{display:inline-block;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .admin-view.active{animation:admin-view-in .58s var(--ease-premium)}
-@keyframes admin-view-in{from{opacity:0;transform:translateX(12px);filter:blur(3px)}to{opacity:1;transform:none;filter:none}}
+@keyframes admin-view-in{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 
 /* Professional Suite shares the same compact, responsive navigation system. */
 .suite-page{width:100%;overflow-x:clip}
@@ -121,3 +120,47 @@ body.notification-open{overflow:hidden}
 @media(max-width:920px){.suite-shell{display:block}.suite-rail{width:100%;max-width:100%}.suite-rail nav{min-width:0;max-width:100%;overscroll-behavior-x:contain}.suite-main{width:100%;max-width:100%}.suite-top,.section-intro{max-width:100%}.suite-actions{justify-content:flex-start}.notification-drawer{top:10px;right:10px;bottom:auto;width:min(410px,calc(100vw - 20px));height:calc(100dvh - 20px);max-height:calc(100dvh - 20px)}}
 @media(max-width:600px){.sidebar{padding-inline:12px}.sidebar nav{gap:2px}.sidebar nav a{width:38px}.admin-infrastructure{grid-template-columns:1fr}.admin-infrastructure .operations-symbol{display:none}.source-meta{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){::view-transition-old(root),::view-transition-new(root){animation:none}.shell,.sidebar,.sidebar *,.main>*{transition:none!important;animation:none!important}.sidebar nav a.nav-feedback{animation:none}.main>header,.main>.analytics-filters,.main>.metrics,.main>.analytics-grid,.main>.tickets,.main>footer{opacity:1}}
+
+/* ---------- Shared rail: overlay expansion (content never re-lays out) ---------- */
+@media(min-width:1051px){
+  .shell,.shell.sidebar-expanded{grid-template-columns:var(--nav-rail) minmax(0,1fr);transition:none}
+  .shell>.main{grid-column:2;transition:none}
+  .sidebar{position:fixed;inset:0 auto 0 0;height:100dvh;z-index:60;width:var(--nav-rail);padding:26px 18px 20px;contain:layout paint style;will-change:width;transition:width var(--nav-speed) var(--ease-premium),box-shadow .2s ease}
+  .shell.sidebar-expanded .sidebar{width:var(--nav-open);padding-inline:18px;box-shadow:18px 0 40px rgba(103,124,153,.2)}
+  /* Match the Professional Suite rail metrics */
+  .sidebar .brand>span:last-child,.workspace-card>span:last-child,.sidebar nav a span,.sidebar-bottom .live-label,.sidebar-bottom>p,.sidebar-actions .reset span{max-width:0;opacity:0;transform:translateX(-6px);transition:max-width var(--nav-speed) var(--ease-premium),opacity .14s ease,transform var(--nav-speed) var(--ease-premium)}
+  .shell.sidebar-expanded .sidebar .brand>span:last-child,.shell.sidebar-expanded .workspace-card>span:last-child,.shell.sidebar-expanded .sidebar nav a span,.shell.sidebar-expanded .sidebar-bottom .live-label,.shell.sidebar-expanded .sidebar-bottom>p,.shell.sidebar-expanded .sidebar-actions .reset span{max-width:170px;opacity:1;transform:none;transition-delay:.02s}
+  .workspace-card{margin:27px auto 24px}
+  .sidebar .nav-label,.shell.sidebar-expanded .sidebar .nav-label{display:none}
+  .sidebar nav{display:grid;gap:5px;padding:2px 0}
+  .sidebar nav a{width:52px;min-height:42px;gap:11px;border-radius:11px;font-size:9px;font-weight:700}
+  .shell.sidebar-expanded .sidebar nav a{padding:0 12px;gap:11px}
+  .sidebar nav a b{flex:0 0 20px;width:20px;height:20px}
+  .sidebar nav svg,.sidebar-actions svg{width:18px;height:18px}
+  .sidebar nav a:hover:not(.selected){transform:translateY(-1px);box-shadow:4px 5px 11px rgba(194,205,220,.55),-3px -3px 8px rgba(255,255,255,.7)}
+  .sidebar nav a.selected::after{height:20px}
+  .sidebar-bottom{margin-top:auto;padding-top:15px}
+  .shell.sidebar-expanded .sidebar-bottom{padding:15px 0 0}
+  .sidebar-bottom .live{min-height:26px;font-size:8px}
+  .sidebar-bottom>p{margin:4px 0 10px;font-size:8px;line-height:1.5}
+  .sidebar-actions{display:grid;grid-template-columns:1fr;gap:8px}
+  .sidebar-actions .reset{width:52px;min-height:42px;margin-inline:auto;padding:0;border-radius:10px;box-shadow:var(--raised-sm);font-size:7px;font-weight:700}
+  .sidebar-actions .reset b{flex:0 0 18px;width:18px;height:18px}
+  .shell.sidebar-expanded .sidebar-actions{grid-template-columns:1fr 1fr}
+  .shell.sidebar-expanded .sidebar-actions .reset{width:100%;justify-content:center;padding:9px;gap:7px}
+  .shell.sidebar-expanded .sidebar-actions .theme-quick-toggle{grid-column:1/-1}
+}
+@media(min-width:921px){
+  .suite-shell,.suite-shell.suite-rail-expanded{grid-template-columns:var(--nav-rail) minmax(0,1fr);transition:none}
+  .suite-rail{z-index:60;contain:layout paint style;transition:width var(--nav-speed) var(--ease-premium),box-shadow .2s ease}
+  .suite-shell.suite-rail-expanded .suite-rail{box-shadow:18px 0 40px rgba(103,124,153,.2)}
+}
+
+/* Entrance animations release their compositing layers when finished (backwards fill instead of forwards). */
+@media(prefers-reduced-motion:no-preference){
+  body{opacity:1;animation:page-in-soft .3s var(--ease-apple) backwards}
+  @keyframes page-in-soft{from{opacity:0}}
+  .reveal{opacity:1;transform:none;animation:reveal-soft .45s var(--ease-apple) backwards;animation-delay:var(--delay,0ms)}
+  @keyframes reveal-soft{from{opacity:0;transform:translateY(8px)}}
+  .main>header,.main>.analytics-filters,.main>.metrics,.main>.analytics-grid,.main>.tickets,.main>footer{opacity:1;animation-fill-mode:backwards}
+}
