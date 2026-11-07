@@ -19,6 +19,9 @@ test('server hashes credentials and protects role-scoped routes',async()=>{
   assert.match(server,/allow\('admin'\)/);
   assert.match(server,/user\.role==='agent'/);
   assert.match(server,/DELETE FROM sessions WHERE user_id/);
+  assert.match(server,/app\.get\(\['\/admin','\/admin\.html'\]/);
+  assert.match(server,/waitForDatabase/);
+  assert.match(server,/status=\$1::varchar/);
 });
 
 test('three seeded demo roles and credentials are present',async()=>{
@@ -35,5 +38,6 @@ test('professional suite is backed by PostgreSQL modules and Jira stays a demo',
   assert.match(html,/This is only a demo, but it can be done\./);
   assert.match(html,/ONLY AVAILABLE INTEGRATION/);
   assert.doesNotMatch(html,/Slack|Teams|WhatsApp|Salesforce|HubSpot/i);
-  assert.match(client,/supportops-consent-v1/);
+  assert.match(client,/SupportOpsPreferences/);
+  for(const route of ['/api/knowledge','/api/automations','/api/customers','/api/auth/sessions/revoke-others'])assert.ok(server.includes(`'${route}`),`missing ${route}`);
 });
