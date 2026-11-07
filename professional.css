@@ -1,6 +1,6 @@
 @import url('expansion.css?v=1');
 @import url('fullstack.css?v=3');
-@import url('suite.css?v=1');
+@import url('suite.css?v=3');
 :root{
   color-scheme:light;
   font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;

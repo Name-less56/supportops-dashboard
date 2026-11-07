@@ -241,6 +241,13 @@ body.dark .conversation article.internal{border-left:3px solid hsl(250 59% 63%)}
 body.dark .conversation header span{color:hsl(220 15% 67%)}
 body.dark .detail-layout aside label{color:hsl(220 16% 75%)}
 body.dark .event-list small{color:hsl(220 15% 66%)}
+body.dark .preference-card[aria-pressed="true"]{outline:1px solid hsl(218 67% 62% / 0.35);background:linear-gradient(145deg,hsl(220 30% 14%),hsl(214 37% 19%))}
+body.dark .text-button.danger{color:hsl(350 41% 72%)}
+body.dark .notification-action{color:hsl(220 16% 73%)}
+body.dark .suite-metric:focus-visible{outline:3px solid hsl(218 75% 67%)}
+body.dark .switch i{background:hsl(220 30% 10%)}
+body.dark .switch:focus-visible{outline:3px solid hsl(218 75% 67%)}
+body.dark #command-results button.active{box-shadow:inset 0 0 0 1px hsl(218 67% 54% / 0.108)}
 
 /* navigation.css */
 body.dark .sidebar nav a::after{box-shadow:0 0 10px hsl(218 67% 54% / 0.228)}
