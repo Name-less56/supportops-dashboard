@@ -61,6 +61,15 @@ async function bootstrapDatabase(){
   }catch(error){await client.query('ROLLBACK');throw error}finally{client.release()}
 }
 
+async function waitForDatabase(){
+  let lastError;
+  for(let attempt=1;attempt<=20;attempt++){
+    try{await pool.query('SELECT 1');return}
+    catch(error){lastError=error;if(attempt<20)await new Promise(resolve=>setTimeout(resolve,750))}
+  }
+  throw lastError;
+}
+
 async function seedProfessionalModules(){
   const userRows=(await pool.query('SELECT id FROM users ORDER BY id')).rows;
   const ticketRows=(await pool.query('SELECT id,status,created_at FROM tickets ORDER BY id')).rows;
@@ -213,10 +222,12 @@ for(const entity of ['categories','groups']){
 
 app.get('/api/health',async(req,res)=>{const result=await pool.query('SELECT NOW() now');res.json({status:'ok',database:'postgresql',time:result.rows[0].now})});
 app.get('/',(req,res)=>res.redirect('/login.html'));
+app.get(['/admin','/admin.html'],async(req,res,next)=>{try{const token=parseCookies(req)[SESSION_COOKIE];if(!token)return res.redirect('/login.html');const {rows}=await pool.query(`SELECT u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>NOW() AND u.active=TRUE`,[sha(token)]);if(rows[0]?.role!=='admin')return res.redirect('/index.html?access=denied');res.set('Cache-Control','no-store').sendFile(path.join(root,'admin.html'))}catch(error){next(error)}});
 app.use((req,res,next)=>{if(['/server.mjs','/schema.sql','/package.json','/package-lock.json','/.env','/.env.example','/docker-compose.yml'].includes(req.path))return res.status(404).end();next()});
 app.use(express.static(root,{extensions:['html'],index:false,maxAge:process.env.NODE_ENV==='production'?'1h':0}));
 app.use((error,req,res,next)=>{console.error(error);res.status(500).json({error:'Unexpected server error.'})});
 
+await waitForDatabase();
 await bootstrapDatabase();
 await seedProfessionalModules();
 app.listen(PORT,()=>console.log(`SupportOps running at http://localhost:${PORT}`));

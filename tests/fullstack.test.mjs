@@ -19,6 +19,8 @@ test('server hashes credentials and protects role-scoped routes',async()=>{
   assert.match(server,/allow\('admin'\)/);
   assert.match(server,/user\.role==='agent'/);
   assert.match(server,/DELETE FROM sessions WHERE user_id/);
+  assert.match(server,/app\.get\(\['\/admin','\/admin\.html'\]/);
+  assert.match(server,/waitForDatabase/);
 });
 
 test('three seeded demo roles and credentials are present',async()=>{

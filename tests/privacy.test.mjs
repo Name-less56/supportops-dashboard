@@ -9,8 +9,8 @@ test('browser assets are local and use current versions',async()=>{
   const html=await read('index.html');
   const scripts=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(match=>match[1]);
   const styles=[...html.matchAll(/<link[^>]+href="([^"]+)"/g)].map(match=>match[1]);
-  assert.deepEqual(scripts,['app.mjs?v=8']);
-  assert.deepEqual(styles,['professional.css?v=4']);
+  assert.deepEqual(scripts,['app.mjs?v=9']);
+  assert.deepEqual(styles,['professional.css?v=5']);
   assert.ok([...scripts,...styles].every(url=>!/^https?:/i.test(url)));
 });
 
@@ -44,6 +44,18 @@ test('login has functional credentials, recovery, scopes, and authorship',async(
   assert.match(login,/Assigned group · Ticket updates/);
   assert.match(login,/Developed by: <strong>Seth Castañeda<\/strong>/);
   assert.match(dashboard,/Developed by: Seth Castañeda/);
+  assert.ok(login.indexOf('login-developer')<login.indexOf('login-story-copy'));
+});
+
+test('role-restricted dashboard controls start hidden and navigation is accessible',async()=>{
+  const [html,css]=await Promise.all([read('index.html'),read('navigation.css')]);
+  assert.match(html,/id="admin-link" href="admin\.html"[^>]* hidden/);
+  assert.match(html,/id="operations-banner" hidden/);
+  assert.match(html,/data-nav-section="tickets"/);
+  assert.match(html,/data-nav-section="analytics"/);
+  assert.match(css,/\[hidden\]\{display:none!important\}/);
+  assert.match(css,/sidebar-expanded/);
+  assert.match(css,/prefers-reduced-motion:reduce/);
 });
 
 test('admin workspace exposes user, category, and group management',async()=>{

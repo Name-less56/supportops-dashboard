@@ -1,0 +1,38 @@
+/* Role-safe visibility: author styles must never override the hidden attribute. */
+[hidden]{display:none!important}
+
+/* Clear section feedback and a calm, tactile press state. */
+.sidebar nav a{position:relative;overflow:hidden;will-change:transform,box-shadow;background-color}
+.sidebar nav a::after{content:"";position:absolute;left:4px;top:50%;width:3px;height:0;border-radius:6px;background:linear-gradient(180deg,#72a1ee,#3974d8);transform:translateY(-50%);opacity:0;transition:height .34s var(--ease-apple),opacity .22s ease}
+.sidebar nav a.selected{transform:translateY(1px) scale(.985);box-shadow:inset 4px 4px 9px #cbd4e1,inset -4px -4px 9px #fff}
+.sidebar nav a.selected::after{height:24px;opacity:1}
+.sidebar nav a.nav-feedback{animation:nav-press .42s var(--ease-apple)}
+@keyframes nav-press{0%{transform:scale(1)}45%{transform:scale(.965)}100%{transform:translateY(1px) scale(.985)}}
+#overview,#analytics,#tickets{scroll-margin-top:28px}
+
+/* The developer credit belongs to the first visual scan, directly below the brand. */
+.login-developer{position:relative!important;left:auto!important;bottom:auto!important;display:inline-flex;align-items:center;gap:4px;width:max-content;margin-top:16px;padding:8px 11px;border:1px solid rgba(255,255,255,.62);border-radius:10px;background:rgba(233,239,248,.72);box-shadow:3px 3px 8px rgba(196,206,220,.65),-3px -3px 8px rgba(255,255,255,.72);backdrop-filter:blur(8px);color:#718097;font-size:8px}
+.login-developer::before{content:"";width:6px;height:6px;border-radius:50%;background:#3974d8;box-shadow:0 0 0 3px rgba(57,116,216,.12)}
+
+@media(min-width:1051px){
+  .shell{grid-template-columns:76px minmax(0,1fr);transition:grid-template-columns .52s var(--ease-apple)}
+  .shell.sidebar-expanded{grid-template-columns:250px minmax(0,1fr)}
+  .sidebar{width:76px;padding-inline:12px;overflow:hidden;z-index:30;transition:width .52s var(--ease-apple),padding .52s var(--ease-apple),box-shadow .4s ease}
+  .shell.sidebar-expanded .sidebar{width:250px;padding-inline:18px;box-shadow:10px 0 30px rgba(112,130,156,.16)}
+  .sidebar .brand{padding-inline:5px;white-space:nowrap}
+  .sidebar .brand>span:last-child,.workspace-card>span:last-child,.sidebar .nav-label,.sidebar nav a span,.sidebar-bottom .live-label,.sidebar-bottom>p,.sidebar-actions .reset span{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;transform:translateX(-7px);pointer-events:none;transition:max-width .42s var(--ease-apple),opacity .2s ease,transform .42s var(--ease-apple)}
+  .shell.sidebar-expanded .sidebar .brand>span:last-child,.shell.sidebar-expanded .workspace-card>span:last-child,.shell.sidebar-expanded .sidebar .nav-label,.shell.sidebar-expanded .sidebar nav a span,.shell.sidebar-expanded .sidebar-bottom .live-label,.shell.sidebar-expanded .sidebar-bottom>p,.shell.sidebar-expanded .sidebar-actions .reset span{max-width:190px;opacity:1;transform:none;pointer-events:auto;transition-delay:.06s}
+  .workspace-card{grid-template-columns:35px minmax(0,1fr);margin-inline:4px;padding-inline:8px;transition:padding .42s var(--ease-apple)}
+  .sidebar nav a{justify-content:center;padding-inline:0;transition:transform .32s var(--ease-apple),box-shadow .32s var(--ease-apple),color .22s ease,background-color .22s ease}
+  .shell.sidebar-expanded .sidebar nav a{justify-content:flex-start;padding-inline:13px}
+  .sidebar nav a b{flex:0 0 20px}
+  .sidebar-bottom{padding-inline:7px}
+  .sidebar-bottom .live{justify-content:center;white-space:nowrap}
+  .shell.sidebar-expanded .sidebar-bottom .live{justify-content:flex-start}
+  .sidebar-actions .reset{display:flex;align-items:center;justify-content:center;gap:9px;min-height:39px;padding-inline:0;white-space:nowrap}
+  .shell.sidebar-expanded .sidebar-actions .reset{justify-content:flex-start;padding-inline:11px}
+  .sidebar-actions .reset b{width:20px;color:#6d7f99;text-align:center;font-size:13px}
+}
+
+@media(max-width:1050px){.login-developer{margin-top:12px}}
+@media(prefers-reduced-motion:reduce){.shell,.sidebar,.sidebar *{transition:none!important}.sidebar nav a.nav-feedback{animation:none}}
