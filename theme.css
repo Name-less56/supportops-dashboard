@@ -1,0 +1,76 @@
+/* Shared theme layer: tokens, dark palette polish and site-wide preferences.
+   Loaded after every other stylesheet; theme-dark.css (generated) handles the long tail of hardcoded colours. */
+
+/* ---------- Comfort dark palette ---------- */
+html[data-theme="dark"]{color-scheme:dark;background:#0e1420}
+body.dark{
+  color-scheme:dark;
+  --bg:#0e1420;--surface:#151d2b;--surface-light:#1b2536;--surface-strong:#1f2a3d;
+  --text:#e6ecf5;--muted:#9eacc0;--subtle:#7a889d;
+  --blue:#6aa1ff;--blue-dark:#93bbff;--blue-soft:#1d2e4a;--blue-pale:#17243a;
+  --line:rgba(148,170,204,.13);
+  --red:#f48a99;--amber:#e8b56a;--green:#62c9b5;
+  --raised:0 0 0 1px rgba(148,170,204,.075),0 12px 30px rgba(0,0,0,.32);
+  --raised-sm:0 0 0 1px rgba(148,170,204,.075),0 4px 12px rgba(0,0,0,.26);
+  --inset:inset 0 0 0 1px rgba(148,170,204,.1),inset 0 2px 6px rgba(0,0,0,.32);
+  background:var(--bg);color:var(--text);scrollbar-color:#2b3a52 transparent;
+}
+body.dark::before{background:radial-gradient(circle at 82% 0%,rgba(106,161,255,.075),transparent 34%),radial-gradient(circle at 10% 100%,rgba(98,201,181,.04),transparent 30%)}
+body.dark ::selection{background:rgba(106,161,255,.35);color:#fff}
+
+/* Surfaces: flat, slightly lifted cards instead of heavy neumorphic glow */
+body.dark :is(.suite-card,.suite-metric,.suite-hero,.metric,.panel,.customer-card,.kanban-column,.preference-card,.shortcut-card,.integration-stage,.analytics-filters,.admin-form,.admin-table-wrap,.auth-card,.login-card,.legal-card,.workspace-card,.load-grid>article,.calendar-grid>section,.report-grid>*,.security-grid>*){background:var(--surface);box-shadow:var(--raised)}
+body.dark :is(.suite-rail,.sidebar){background:#111927;border-color:rgba(148,170,204,.08);box-shadow:none}
+body.dark .suite-shell.suite-rail-expanded .suite-rail,body.dark .shell.sidebar-expanded .sidebar{box-shadow:18px 0 40px rgba(0,0,0,.4)}
+body.dark .suite-hero{background:linear-gradient(135deg,#17233a,#141c2b 60%)}
+body.dark :is(.kanban-card,.recommendations>button,.article-list>article,.automation-list>article,.notification-drawer article,.conversation article,.content-summary>div){background:var(--surface-light);box-shadow:0 0 0 1px rgba(148,170,204,.07)}
+body.dark :is(.kanban-card,.recommendations>button,.article-list>article,.automation-list>article):hover{background:var(--surface-strong)}
+body.dark .notification-drawer{background:#121a28;border-color:rgba(148,170,204,.09);box-shadow:-24px 0 60px rgba(0,0,0,.45)}
+body.dark .notification-drawer .drawer-head{background:linear-gradient(180deg,#121a28 78%,transparent)}
+body.dark dialog{background:#151d2b;color:var(--text);box-shadow:0 0 0 1px rgba(148,170,204,.1),0 30px 80px rgba(0,0,0,.55)}
+body.dark dialog::backdrop{background:rgba(3,6,12,.62)}
+body.dark .cookie-banner{background:rgba(21,29,43,.97);border-color:rgba(148,170,204,.12)}
+
+/* Text hierarchy */
+body.dark :is(h1,h2,h3,.metric-value,.report-number,.suite-metric strong,.health-orb strong){color:#f1f5fb}
+body.dark :is(.suite-nav.active,.sidebar nav a.selected){background:var(--blue-soft);color:var(--blue-dark);box-shadow:none}
+body.dark .suite-nav.active b,body.dark .sidebar nav a.selected b{color:var(--blue-dark)}
+
+/* Controls */
+body.dark :is(input,select,textarea){color:var(--text);background-color:#101827;box-shadow:var(--inset)}
+body.dark :is(input,textarea)::placeholder{color:#6f7f96}
+body.dark select option{background:#151d2b;color:var(--text)}
+body.dark :is(.button.outline,.icon-btn,.suite-icon-button,.command-trigger,.notification-action,.suite-rail-bottom a,.suite-rail-bottom button,.reset,.text-button.pill){background:var(--surface-light);color:#c3cfe0;box-shadow:0 0 0 1px rgba(148,170,204,.1)}
+body.dark :is(.button.outline,.icon-btn,.suite-icon-button,.command-trigger,.suite-rail-bottom a,.suite-rail-bottom button,.reset):hover{background:var(--surface-strong);color:#fff}
+body.dark .button.primary{box-shadow:0 6px 18px rgba(57,116,216,.32)}
+body.dark kbd{background:#101827;border-color:rgba(148,170,204,.16);color:#aab7ca;box-shadow:none}
+body.dark .health-orb>div{box-shadow:0 0 0 1px rgba(148,170,204,.08),0 16px 36px rgba(0,0,0,.4)}
+body.dark .health-orb>div::after{background:#141c2b;box-shadow:inset 0 0 0 1px rgba(148,170,204,.08)}
+body.dark .preference-card[aria-pressed="true"]{background:linear-gradient(145deg,#1b2c47,#18243a);outline-color:rgba(106,161,255,.45)}
+body.dark .notice{background:#1b2536;color:var(--text);box-shadow:0 0 0 1px rgba(148,170,204,.12),0 14px 34px rgba(0,0,0,.45)}
+
+/* ---------- Health ring driven by the live score ---------- */
+.health-orb>div{background:conic-gradient(var(--blue) 0 var(--score,94%),var(--ring-track,#d1dbea) var(--score,94%) 100%)}
+body.dark .health-orb>div{--ring-track:#243048}
+
+/* ---------- Reduced motion (keeps end states visible) ---------- */
+html[data-motion="reduce"]{scroll-behavior:auto}
+html[data-motion="reduce"]::view-transition-old(root),html[data-motion="reduce"]::view-transition-new(root){animation:none!important}
+body.reduce-motion,body.reduce-motion *,body.reduce-motion *::before,body.reduce-motion *::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;transition-delay:0s!important;scroll-behavior:auto!important}
+
+/* ---------- Compact density on the classic pages ---------- */
+body.compact .main{padding-top:24px;padding-bottom:20px}
+body.compact .metrics{gap:12px;margin-top:20px}
+body.compact .metric{min-height:112px;padding:15px}
+body.compact :is(.mid,.analytics-grid,.tickets){gap:12px;margin-top:12px}
+body.compact .panel{padding:16px 18px}
+body.compact td{padding-top:7px;padding-bottom:7px}
+body.compact .top h1{font-size:clamp(26px,2.4vw,32px)}
+
+/* ---------- Appearance toggle used on non-suite pages ---------- */
+.theme-quick-toggle b svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+
+/* Segmented controls: make the selected option obvious on dark surfaces */
+body.dark .segmented{background:#101827;box-shadow:var(--inset)}
+body.dark .segmented button{color:#8f9db2}
+body.dark .segmented button.active{background:var(--blue-soft);color:var(--blue-dark);box-shadow:0 0 0 1px rgba(106,161,255,.25)}

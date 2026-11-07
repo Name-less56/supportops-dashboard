@@ -9,8 +9,8 @@ test('browser assets are local and use current versions',async()=>{
   const html=await read('index.html');
   const scripts=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(match=>match[1]);
   const styles=[...html.matchAll(/<link[^>]+href="([^"]+)"/g)].map(match=>match[1]);
-  assert.deepEqual(scripts,['app.mjs?v=11']);
-  assert.deepEqual(styles,['professional.css?v=6','navigation.css?v=4']);
+  assert.deepEqual(scripts,['preferences.js?v=1','app.mjs?v=11']);
+  assert.deepEqual(styles,['professional.css?v=8','navigation.css?v=6','theme-dark.css?v=1','theme.css?v=1']);
   assert.ok([...scripts,...styles].every(url=>!/^https?:/i.test(url)));
 });
 
@@ -83,4 +83,24 @@ test('admin workspace exposes user, category, and group management',async()=>{
   assert.match(admin,/id="category-form"/);
   assert.match(admin,/id="group-form"/);
   assert.match(admin,/id="governance-form"/);
+});
+
+test('appearance preferences load first on every page and persist site-wide',async()=>{
+  const {readdir}=await import('node:fs/promises');
+  const pages=(await readdir(root)).filter(name=>name.endsWith('.html')&&name!=='suite.html');
+  for(const page of pages){
+    const html=await read(page);
+    assert.match(html,/<body[^>]*><script src="preferences\.js\?v=\d+"><\/script>/,`${page} must load preferences.js before content`);
+    assert.match(html,/theme-dark\.css/,`${page} must load the dark theme`);
+    assert.match(html,/theme\.css/,`${page} must load the theme layer`);
+  }
+  const prefs=await read('preferences.js');
+  assert.match(prefs,/localStorage/);
+  assert.match(prefs,/addEventListener\('storage'/);
+  assert.match(prefs,/prefers-color-scheme: dark/);
+});
+
+test('templates avoid inline style attributes blocked by the CSP',async()=>{
+  for(const file of ['app.mjs','admin.mjs'])assert.doesNotMatch(await read(file),/ style="/,`${file} must use data-style instead of style=`);
+  assert.doesNotMatch(await read('fullstack.css'),/body\{[^}]*transform:/,'a transform on body breaks the fixed navigation rail');
 });
