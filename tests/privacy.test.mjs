@@ -9,8 +9,8 @@ test('browser assets are local and use current versions',async()=>{
   const html=await read('index.html');
   const scripts=[...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map(match=>match[1]);
   const styles=[...html.matchAll(/<link[^>]+href="([^"]+)"/g)].map(match=>match[1]);
-  assert.deepEqual(scripts,['app.mjs?v=9']);
-  assert.deepEqual(styles,['professional.css?v=5']);
+  assert.deepEqual(scripts,['app.mjs?v=10']);
+  assert.deepEqual(styles,['professional.css?v=6','navigation.css?v=2']);
   assert.ok([...scripts,...styles].every(url=>!/^https?:/i.test(url)));
 });
 
@@ -47,14 +47,19 @@ test('login has functional credentials, recovery, scopes, and authorship',async(
   assert.ok(login.indexOf('login-developer')<login.indexOf('login-story-copy'));
 });
 
-test('role-restricted dashboard controls start hidden and navigation is accessible',async()=>{
-  const [html,css]=await Promise.all([read('index.html'),read('navigation.css')]);
+test('role-restricted dashboard controls and navigation remain accessible',async()=>{
+  const [html,admin,css]=await Promise.all([read('index.html'),read('admin.html'),read('navigation.css')]);
   assert.match(html,/id="admin-link" href="admin\.html"[^>]* hidden/);
-  assert.match(html,/id="operations-banner" hidden/);
+  assert.doesNotMatch(html,/LIVE DATA INFRASTRUCTURE/);
+  assert.match(admin,/LIVE DATA INFRASTRUCTURE/);
+  assert.match(admin,/id="admin-sync"/);
+  assert.doesNotMatch(admin,/Open admin panel/);
   assert.match(html,/data-nav-section="tickets"/);
   assert.match(html,/data-nav-section="analytics"/);
+  assert.ok(html.indexOf('data-nav-section="analytics"')<html.indexOf('data-nav-section="tickets"'));
   assert.match(css,/\[hidden\]\{display:none!important\}/);
   assert.match(css,/sidebar-expanded/);
+  assert.match(css,/@view-transition/);
   assert.match(css,/prefers-reduced-motion:reduce/);
 });
 
