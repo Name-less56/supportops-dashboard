@@ -61,6 +61,15 @@ async function bootstrapDatabase(){
   }catch(error){await client.query('ROLLBACK');throw error}finally{client.release()}
 }
 
+async function waitForDatabase(){
+  let lastError;
+  for(let attempt=1;attempt<=20;attempt++){
+    try{await pool.query('SELECT 1');return}
+    catch(error){lastError=error;if(attempt<20)await new Promise(resolve=>setTimeout(resolve,750))}
+  }
+  throw lastError;
+}
+
 async function seedProfessionalModules(){
   const userRows=(await pool.query('SELECT id FROM users ORDER BY id')).rows;
   const ticketRows=(await pool.query('SELECT id,status,created_at FROM tickets ORDER BY id')).rows;
@@ -136,7 +145,7 @@ function ticketFilters(req,start=1){const values=[],clauses=[];const add=(sql,va
 app.get('/api/tickets',auth,async(req,res)=>{const {values,where}=ticketFilters(req);const sort={newest:'t.created_at DESC',oldest:'t.created_at ASC',priority:"CASE t.priority WHEN 'Critical' THEN 1 WHEN 'High' THEN 2 WHEN 'Medium' THEN 3 ELSE 4 END,t.created_at ASC",status:"CASE t.status WHEN 'Open' THEN 1 WHEN 'In progress' THEN 2 ELSE 3 END,t.created_at ASC"}[req.query.sort]||"CASE WHEN t.status='Resolved' THEN 999999 ELSE EXTRACT(EPOCH FROM (t.created_at + (c.sla_hours||' hours')::interval - NOW())) END ASC";
   const {rows}=await pool.query(`SELECT t.*,c.name category,c.sla_hours,g.name group_name,u.display_name assigned_name FROM tickets t JOIN categories c ON c.id=t.category_id JOIN support_groups g ON g.id=t.group_id LEFT JOIN users u ON u.id=t.assigned_user_id ${where} ORDER BY ${sort} LIMIT 250`,values);res.json({tickets:rows})});
 app.post('/api/tickets',auth,async(req,res)=>{const {subject,categoryId,groupId,priority,channel}=req.body;if(String(subject||'').trim().length<4)return res.status(400).json({error:'Subject must contain at least 4 characters.'});const group=req.user.role==='agent'?req.user.group_id:Number(groupId);const next=Number((await pool.query("SELECT COALESCE(MAX(SUBSTRING(public_id FROM '[0-9]+')::int),2100)+1 next FROM tickets")).rows[0].next);const {rows}=await pool.query(`INSERT INTO tickets(public_id,subject,category_id,group_id,assigned_user_id,priority,status,channel) VALUES($1,$2,$3,$4,$5,$6,'Open',$7) RETURNING *`,[`T-${next}`,String(subject).trim().slice(0,160),Number(categoryId),group,req.user.id,priority,channel]);res.status(201).json({ticket:rows[0]})});
-app.patch('/api/tickets/:id',auth,async(req,res)=>{const id=Number(req.params.id);const allowed=['Open','In progress','Resolved'];if(!allowed.includes(req.body.status))return res.status(400).json({error:'Invalid status.'});const groupClause=req.user.role==='agent'?' AND group_id=$3':'';const values=req.user.role==='agent'?[req.body.status,id,req.user.group_id]:[req.body.status,id];const {rows}=await pool.query(`UPDATE tickets SET status=$1,updated_at=NOW(),resolved_at=CASE WHEN $1='Resolved' THEN NOW() ELSE NULL END WHERE id=$2${groupClause} RETURNING *`,values);if(!rows[0])return res.status(404).json({error:'Ticket not found.'});res.json({ticket:rows[0]})});
+app.patch('/api/tickets/:id',auth,async(req,res)=>{const id=Number(req.params.id);const allowed=['Open','In progress','Resolved'];if(!allowed.includes(req.body.status))return res.status(400).json({error:'Invalid status.'});const groupClause=req.user.role==='agent'?' AND group_id=$3':'';const values=req.user.role==='agent'?[req.body.status,id,req.user.group_id]:[req.body.status,id];const {rows}=await pool.query(`UPDATE tickets SET status=$1::varchar,updated_at=NOW(),resolved_at=CASE WHEN $1::varchar='Resolved' THEN NOW() ELSE NULL END WHERE id=$2${groupClause} RETURNING *`,values);if(!rows[0])return res.status(404).json({error:'Ticket not found.'});res.json({ticket:rows[0]})});
 
 app.get('/api/analytics',auth,async(req,res)=>{const {values,where}=ticketFilters(req);const base=`FROM tickets t JOIN categories c ON c.id=t.category_id JOIN support_groups g ON g.id=t.group_id ${where}`;const queries=[
   pool.query(`SELECT COUNT(*)::int total,COUNT(*) FILTER(WHERE t.status!='Resolved')::int active,COUNT(*) FILTER(WHERE t.status='Resolved')::int resolved,COUNT(*) FILTER(WHERE t.status!='Resolved' AND t.created_at + (c.sla_hours||' hours')::interval<NOW())::int breached,COALESCE(ROUND(AVG(EXTRACT(EPOCH FROM (t.resolved_at-t.created_at))/3600)::numeric,1),0) avg_resolution_hours ${base}`,values),
@@ -188,7 +197,7 @@ app.patch('/api/tickets/:id/manage',auth,async(req,res)=>{
 
 app.post('/api/tickets/bulk',auth,async(req,res)=>{
   const ids=Array.isArray(req.body.ids)?req.body.ids.map(Number).filter(Boolean).slice(0,100):[],status=['Open','In progress','Resolved'].includes(req.body.status)?req.body.status:null;if(!ids.length||!status)return res.status(400).json({error:'Select tickets and a valid status.'});
-  const {rowCount}=await pool.query(`UPDATE tickets SET status=$1,updated_at=NOW(),resolved_at=CASE WHEN $1='Resolved' THEN NOW() ELSE NULL END WHERE id=ANY($2::int[])${req.user.role==='agent'?' AND group_id=$3':''}`,req.user.role==='agent'?[status,ids,req.user.group_id]:[status,ids]);res.json({updated:rowCount});
+  const {rowCount}=await pool.query(`UPDATE tickets SET status=$1::varchar,updated_at=NOW(),resolved_at=CASE WHEN $1::varchar='Resolved' THEN NOW() ELSE NULL END WHERE id=ANY($2::int[])${req.user.role==='agent'?' AND group_id=$3':''}`,req.user.role==='agent'?[status,ids,req.user.group_id]:[status,ids]);res.json({updated:rowCount});
 });
 
 app.post('/api/automations/:id/run',auth,allow('admin','supervisor'),async(req,res)=>{const {rows}=await pool.query('UPDATE automation_rules SET run_count=run_count+1 WHERE id=$1 RETURNING *',[Number(req.params.id)]);if(!rows[0])return res.status(404).json({error:'Automation not found.'});await pool.query(`INSERT INTO notifications(user_id,title,body,kind) VALUES($1,'Automation simulated',$2,'success')`,[req.user.id,`${rows[0].name} completed in demo mode.`]);res.json({rule:rows[0],message:'Simulation completed. No external action was sent.'})});
@@ -213,10 +222,12 @@ for(const entity of ['categories','groups']){
 
 app.get('/api/health',async(req,res)=>{const result=await pool.query('SELECT NOW() now');res.json({status:'ok',database:'postgresql',time:result.rows[0].now})});
 app.get('/',(req,res)=>res.redirect('/login.html'));
+app.get(['/admin','/admin.html'],async(req,res,next)=>{try{const token=parseCookies(req)[SESSION_COOKIE];if(!token)return res.redirect('/login.html');const {rows}=await pool.query(`SELECT u.role FROM sessions s JOIN users u ON u.id=s.user_id WHERE s.token_hash=$1 AND s.expires_at>NOW() AND u.active=TRUE`,[sha(token)]);if(rows[0]?.role!=='admin')return res.redirect('/index.html?access=denied');res.set('Cache-Control','no-store').sendFile(path.join(root,'admin.html'))}catch(error){next(error)}});
 app.use((req,res,next)=>{if(['/server.mjs','/schema.sql','/package.json','/package-lock.json','/.env','/.env.example','/docker-compose.yml'].includes(req.path))return res.status(404).end();next()});
 app.use(express.static(root,{extensions:['html'],index:false,maxAge:process.env.NODE_ENV==='production'?'1h':0}));
 app.use((error,req,res,next)=>{console.error(error);res.status(500).json({error:'Unexpected server error.'})});
 
+await waitForDatabase();
 await bootstrapDatabase();
 await seedProfessionalModules();
 app.listen(PORT,()=>console.log(`SupportOps running at http://localhost:${PORT}`));
