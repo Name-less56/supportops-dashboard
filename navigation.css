@@ -82,7 +82,6 @@ body::before{content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;ba
 .notification-drawer .drawer-head{position:sticky;z-index:2;top:-27px;padding:0 0 10px;background:linear-gradient(180deg,rgba(233,239,248,.99) 75%,transparent)}
 .notification-drawer .icon-btn{flex:0 0 42px}
 body.notification-open{overflow:hidden}
-body.dark .notification-scrim{background:rgba(7,12,20,.48)}
 
 @media(min-width:921px){
   .suite-shell{grid-template-columns:var(--nav-rail) minmax(0,1fr);transition:grid-template-columns var(--nav-speed) var(--ease-premium)}
@@ -102,11 +101,12 @@ body.dark .notification-scrim{background:rgba(7,12,20,.48)}
   .suite-shell.suite-rail-expanded .suite-nav{justify-content:flex-start;width:100%;padding:0 12px}
   .suite-nav:hover:not(.active){transform:translateY(-1px);box-shadow:4px 5px 11px rgba(194,205,220,.55),-3px -3px 8px rgba(255,255,255,.7)}
   .suite-rail-bottom{grid-template-columns:1fr;width:52px;margin-inline:auto;transition:width var(--nav-speed) var(--ease-premium),grid-template-columns var(--nav-speed) var(--ease-premium)}
-  .suite-rail-bottom a,.suite-rail-bottom button{width:52px;min-height:38px;padding:0;font-size:0}
-  .suite-rail-bottom a::before{content:"←";font-size:13px}.suite-rail-bottom button::before{content:"⇥";font-size:13px}
+  .suite-rail-bottom a,.suite-rail-bottom button{width:52px;min-height:42px;padding:0;font-size:0}
+  .suite-rail-bottom .rail-action-icon{font-size:13px}
+  .suite-rail-bottom .rail-action-label{display:none}
   .suite-shell.suite-rail-expanded .suite-rail-bottom{grid-template-columns:1fr 1fr;width:100%}
   .suite-shell.suite-rail-expanded .suite-rail-bottom a,.suite-shell.suite-rail-expanded .suite-rail-bottom button{width:auto;padding:9px;font-size:7px}
-  .suite-shell.suite-rail-expanded .suite-rail-bottom a::before,.suite-shell.suite-rail-expanded .suite-rail-bottom button::before{content:none}
+  .suite-shell.suite-rail-expanded .suite-rail-bottom .rail-action-label{display:inline}
 }
 @media(max-width:1050px){
   .shell{display:block}.main{width:100%;max-width:none;margin:0}

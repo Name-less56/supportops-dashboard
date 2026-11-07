@@ -87,7 +87,7 @@ test('admin workspace exposes user, category, and group management',async()=>{
 
 test('appearance preferences load first on every page and persist site-wide',async()=>{
   const {readdir}=await import('node:fs/promises');
-  const pages=(await readdir(root)).filter(name=>name.endsWith('.html')&&name!=='suite.html');
+  const pages=(await readdir(root)).filter(name=>name.endsWith('.html'));
   for(const page of pages){
     const html=await read(page);
     assert.match(html,/<body[^>]*><script src="preferences\.js\?v=\d+"><\/script>/,`${page} must load preferences.js before content`);
@@ -101,6 +101,6 @@ test('appearance preferences load first on every page and persist site-wide',asy
 });
 
 test('templates avoid inline style attributes blocked by the CSP',async()=>{
-  for(const file of ['app.mjs','admin.mjs'])assert.doesNotMatch(await read(file),/ style="/,`${file} must use data-style instead of style=`);
+  for(const file of ['app.mjs','admin.mjs','suite.mjs'])assert.doesNotMatch(await read(file),/ style="/,`${file} must use data-style instead of style=`);
   assert.doesNotMatch(await read('fullstack.css'),/body\{[^}]*transform:/,'a transform on body breaks the fixed navigation rail');
 });
